@@ -7,14 +7,8 @@ import kotlin.math.sin
 
 class MySketch: PApplet(){
 
-    companion object Factory {
-        fun run() {
-            val mySketch = MySketch()
-            mySketch.setSize(1000, 1000)
-
-            mySketch.runSketch()
-        }
-    }
+    var blendmodes = intArrayOf(BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN)
+    private var current_blendmode = BLEND
 
     var offset = 0f
 
@@ -75,11 +69,10 @@ class MySketch: PApplet(){
         if (key == 's') {
             kotlin.io.println("saving screenshot")
             save("screenshots/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd - hhmmss")) + ".png")
+        } else if (key in '0'..'9') {
+            current_blendmode = blendmodes[Character.getNumericValue(key) % blendmodes.size]
         }
     }
-
-
-
 
     fun easeInOutCubic(x: Float): Float {
         return if (x < 0.5f) {
@@ -87,7 +80,14 @@ class MySketch: PApplet(){
         } else {
             1 - pow(-2 * x + 2, 3f) / 2
         }
+    }
 
+    companion object Factory {
+        fun run(sizeX: Int, sizeY: Int) {
+            val mySketch = MySketch()
+            mySketch.setSize(sizeX, sizeY)
+            mySketch.runSketch()
+        }
     }
 }
 
@@ -95,6 +95,6 @@ class MySketch: PApplet(){
 
 
 fun main(args:Array<String>){
-    MySketch.run()
+    MySketch.run(1000, 1000)
 }
 
