@@ -4,41 +4,27 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-class MySketch: PApplet(){
+class MySketch : PApplet() {
+    private var circleX: Float = 200f
+    private var circleY: Float = 200f
 
     var blendmodes = intArrayOf(BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN)
     private var current_blendmode = BLEND
 
     override fun setup() {
-        colorMode(PConstants.HSB, 360f, 100f, 100f, 100f)
-        background(color(250, 100, 20))
-//        noStroke()
-    }
-
-    fun ease(x: Float, min: Float, max: Float, amplitude: Float): Float {
-        var slide = map(x, min, max, 0f, 2f)
-        if (slide <= 1) {
-            return amplitude * easeInOutCubic(slide)
-        } else {
-            slide -= 1f
-            return amplitude * (1 - easeInOutCubic(slide))
-        }
+        colorMode(PConstants.HSB, 360f, 100f, 100f, 1.0f)
+        stroke(color(150, 255, 200))
+        strokeWeight(100f)
     }
 
     override fun draw() {
-        blendMode(PConstants.BLEND)
         background(color(250, 100, 20))
-        blendMode(current_blendmode)
-
-//        fill(color(150,100,100))
-        loadPixels()
-        for (i in 0 until width * height) {
-            val h = ease(i.toFloat() % width, 0f, (width).toFloat(), 360f)
-            pixels[i] = color(h.toInt(), 40, 80)
-        }
-        updatePixels()
-
-        noLoop()
+        fill(color(150, 255, 200))
+        val newCircleX = lerp(circleX, mouseX.toFloat(), 0.08f)
+        val newCircleY = lerp(circleY, mouseY.toFloat(), 0.1f)
+        line(circleX, circleY, newCircleX, newCircleY)
+        circleX = newCircleX
+        circleY = newCircleY
     }
 
     override fun mouseClicked() {
@@ -66,13 +52,13 @@ class MySketch: PApplet(){
     companion object Factory {
         fun run(sizeX: Int, sizeY: Int) {
             val mySketch = MySketch()
+            mySketch.setSize(600, 600)
+
             mySketch.setSize(sizeY, sizeX)
             mySketch.runSketch()
         }
     }
 }
-
-
 
 
 fun main(args:Array<String>){
