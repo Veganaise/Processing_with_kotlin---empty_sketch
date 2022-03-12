@@ -2,15 +2,12 @@ import processing.core.PApplet
 import processing.core.PConstants
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.cos
-import kotlin.math.sin
+
 
 class MySketch: PApplet(){
 
     var blendmodes = intArrayOf(BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN)
     private var current_blendmode = BLEND
-
-    var offset = 0f
 
     override fun setup() {
         colorMode(PConstants.HSB, 360f, 100f, 100f, 100f)
@@ -19,44 +16,28 @@ class MySketch: PApplet(){
     }
 
     fun ease(x: Float, min: Float, max: Float, amplitude: Float): Float {
-        val x_mod = x
-        var slide = map(x_mod, min, max, 0f, 2f)
+        var slide = map(x, min, max, 0f, 2f)
         if (slide <= 1) {
             return amplitude * easeInOutCubic(slide)
         } else {
             slide -= 1f
             return amplitude * (1 - easeInOutCubic(slide))
         }
-//        return amplitude * sin(slide* PConstants.TWO_PI)
     }
 
-    override fun draw(){
+    override fun draw() {
         blendMode(PConstants.BLEND)
         background(color(250, 100, 20))
-        blendMode(PConstants.ADD)
+        blendMode(current_blendmode)
 
 //        fill(color(150,100,100))
-
-        for (x in 300 until 701 step 1) {
-            for (id_line in 0 until 3) {
-                noFill()
-                stroke(color(map(id_line.toFloat(), 0f, 3f, 0f, 360f), 50f, 90f), 33f)
-                strokeWeight(1.3f)
-                beginShape()
-                for (y in 200 until 801 step 3) {
-                    val easeVal = ease(y.toFloat(), 200f, 800f, 40f)
-                    val n = easeVal * (0.5f - noise((y / 10).toFloat(), offset, id_line.toFloat()))
-                    val mod2 = if (id_line % 2 < 0.1) 1 else -1
-                    val s =
-                        easeVal * (sin((y * 0.01f * PConstants.TWO_PI)) * mouseX.toFloat() * 0.001f + cos(y * 0.0001f * PConstants.TWO_PI) * mouseY.toFloat() * 0.01f)
-                    val easeX = (x + n + s) * mod2
-                    curveVertex(easeX, y.toFloat())
-                }
-                endShape()
-                offset += 0.03f
-            }
+        loadPixels()
+        for (i in 0 until width * height) {
+            val h = ease(i.toFloat() % width, 0f, (width).toFloat(), 360f)
+            pixels[i] = color(h.toInt(), 40, 80)
         }
-//        println("here")
+        updatePixels()
+
         noLoop()
     }
 
@@ -68,7 +49,7 @@ class MySketch: PApplet(){
     override fun keyPressed() {
         if (key == 's') {
             kotlin.io.println("saving screenshot")
-            save("screenshots/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd - hhmmss")) + ".png")
+            save("screenshots/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss")) + ".png")
         } else if (key in '0'..'9') {
             current_blendmode = blendmodes[Character.getNumericValue(key) % blendmodes.size]
         }
@@ -85,7 +66,7 @@ class MySketch: PApplet(){
     companion object Factory {
         fun run(sizeX: Int, sizeY: Int) {
             val mySketch = MySketch()
-            mySketch.setSize(sizeX, sizeY)
+            mySketch.setSize(sizeY, sizeX)
             mySketch.runSketch()
         }
     }
@@ -95,6 +76,6 @@ class MySketch: PApplet(){
 
 
 fun main(args:Array<String>){
-    MySketch.run(1000, 1000)
+    MySketch.run(80, 800)
 }
 
