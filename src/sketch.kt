@@ -9,7 +9,8 @@ class MySketch : PApplet() {
     private var circleY: Float = 200f
 
     var blendmodes = intArrayOf(BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN)
-    private var current_blendmode = BLEND
+    private var currentBlendmode = BLEND
+    private var sketchIsLooping = true
 
     override fun setup() {
         colorMode(PConstants.HSB, 360f, 100f, 100f, 1.0f)
@@ -29,7 +30,7 @@ class MySketch : PApplet() {
 
     override fun mouseClicked() {
         super.mouseClicked()
-        loop()
+        redraw()
     }
 
     override fun keyPressed() {
@@ -37,7 +38,14 @@ class MySketch : PApplet() {
             kotlin.io.println("saving screenshot")
             save("screenshots/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss")) + ".png")
         } else if (key in '0'..'9') {
-            current_blendmode = blendmodes[Character.getNumericValue(key) % blendmodes.size]
+            currentBlendmode = blendmodes[Character.getNumericValue(key) % blendmodes.size]
+        } else if (key == ' ') {
+            if (sketchIsLooping) {
+                noLoop()
+            } else {
+                loop()
+            }
+            sketchIsLooping = !sketchIsLooping
         }
     }
 
@@ -62,6 +70,6 @@ class MySketch : PApplet() {
 
 
 fun main(args:Array<String>){
-    MySketch.run(80, 800)
+    MySketch.run(500, 500)
 }
 
