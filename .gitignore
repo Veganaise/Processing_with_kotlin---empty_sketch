@@ -27,5 +27,6 @@ hs_err_pid*
 
 target/*
 
-.iml
-Processing_empty_sketch.iml
+*.iml
+
+/screenshots/*

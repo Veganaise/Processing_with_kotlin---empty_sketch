@@ -1,9 +1,16 @@
 import processing.core.PApplet
 import processing.core.PConstants
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 
 class MySketch : PApplet() {
     private var circleX: Float = 200f
     private var circleY: Float = 200f
+
+    var blendmodes = intArrayOf(BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN)
+    private var currentBlendmode = BLEND
+    private var sketchIsLooping = true
 
     override fun setup() {
         colorMode(PConstants.HSB, 360f, 100f, 100f, 1.0f)
@@ -21,18 +28,48 @@ class MySketch : PApplet() {
         circleY = newCircleY
     }
 
+    override fun mouseClicked() {
+        super.mouseClicked()
+        redraw()
+    }
+
+    override fun keyPressed() {
+        if (key == 's') {
+            kotlin.io.println("saving screenshot")
+            save("screenshots/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-hhmmss")) + ".png")
+        } else if (key in '0'..'9') {
+            currentBlendmode = blendmodes[Character.getNumericValue(key) % blendmodes.size]
+        } else if (key == ' ') {
+            if (sketchIsLooping) {
+                noLoop()
+            } else {
+                loop()
+            }
+            sketchIsLooping = !sketchIsLooping
+        }
+    }
+
+    fun easeInOutCubic(x: Float): Float {
+        return if (x < 0.5f) {
+            4 * x * x * x
+        } else {
+            1 - pow(-2 * x + 2, 3f) / 2
+        }
+    }
 
     companion object Factory {
-        fun run() {
+        fun run(sizeX: Int, sizeY: Int) {
             val mySketch = MySketch()
             mySketch.setSize(600, 600)
 
+            mySketch.setSize(sizeY, sizeX)
             mySketch.runSketch()
         }
     }
 }
 
+
 fun main(args:Array<String>){
-    MySketch.run()
+    MySketch.run(500, 500)
 }
 
