@@ -36,20 +36,19 @@ class MySketch : PApplet() {
     override fun draw() {
         background(color(243, 73, 25))
         //background(base_image)
-        fill(color(150, 255, 200))
-        base_image.loadPixels()
-        val scale: Float = map(
-            mouseX.toFloat(), 0F, base_image.width.toFloat(), 0F, 100F
-        )
-        println("scale:$scale")
+        fill(color(200, 255, 200))
+        //base_image.loadPixels()
+//        val scale: Float = map(
+//            mouseX.toFloat(), 0F, base_image.width.toFloat(), 0F, 100F
+//        )
+//        println("scale:$scale")
         for (dot in dots) {
-            val sc = scale * noise(dot.x * 0.01F, dot.y * 0.01F, 15F) * 0.5F
-            val warpedPosition = getWarpedPosition(dot.x, dot.y, sc)
-            //val col = getColorAtPosition(dot.x,dot.y)
+//            val sc = scale * noise(dot.x * 0.01F, dot.y * 0.01F, 15F) * 0.5F
+            //val warpedPosition = getWarpedPosition(dot.x, dot.y, sc)
+            val col = getColorAtPosition(dot.x, dot.y, 10F)
+            stroke(col)
             //println(col)
-            //stroke(base_image.pixels[(dot.x*base_image.pixelWidth+dot.y).toInt()])
-            //stroke(base_image.pixels[(dot.x+dot.y*base_image.pixelHeight).toInt()%base_image.pixels.size])
-            stroke(base_image.get(warpedPosition.x.toInt(), warpedPosition.y.toInt()))
+            //stroke(base_image.get(warpedPosition.x.toInt(), warpedPosition.y.toInt()))
             point(dot.x, dot.y)
         }
 
@@ -92,17 +91,6 @@ class MySketch : PApplet() {
             mySketch.setSize(image.pixelWidth, image.pixelHeight)
             mySketch.runSketch()
         }
-
-        fun run(imageAbsoluteFilePath: String) {
-            val mySketch = MySketch()
-
-            mySketch.base_image = mySketch.loadImage(imageAbsoluteFilePath)
-            mySketch.setSize(
-                mySketch.base_image.pixelWidth, mySketch.base_image.pixelHeight
-            )
-            mySketch.runSketch()
-
-        }
     }
 
 
@@ -121,29 +109,25 @@ class MySketch : PApplet() {
         return PVector(x + dx, y + dy)
     }
 
-    fun getColorAtPosition(x: Float, y: Float): Int {
-        val machin = x % 9//map(x,80F, (height-80).toFloat(), 0F,1F)//noise(x*0.01f,y*0.1f).absoluteValue
-        if (machin < 0.5F) {
-            print('0')
-            return color(333, 85, 97)
-        } else {
-            print(x)
-            return color(194, 68, 94)
-        }
-        //print(machin," : ")
-        //return lerpColor(color(30, 93, 100),color(35, 10, 50),machin)
-        //        return lerpColor("FF8811".toInt(16),"392F5A".toInt(16),machin)
-    }
+    fun getColorAtPosition(x: Float, y: Float, scale: Float): Int {
+        var dx = 0F
+        var dy = 0F
+        var dz = 0F
+        var sc = scale
 
-    fun getColorAtPosition(x: Float, y: Float, pixels: Array<Int>): Int {
-        val machin = x % 9//map(x,80F, (height-80).toFloat(), 0F,1F)//noise(x*0.01f,y*0.1f).absoluteValue
-        if (machin < 0.5F) {
-            print('0')
-            return color(333, 85, 97)
-        } else {
-            print(x)
-            return color(194, 68, 94)
+        for (i in 0..3) {
+            dx += (noise(x * 0.001F + i, y * 0.001F + i, i.toFloat()))
+            dy += (noise(x * 0.001F - i, y * 0.001F - i, (-i).toFloat()))
+            dz += (noise(x * 0.001F - (i * 2), y * 0.001F - (i * 3), 0F))
+            sc *= 0.6F
         }
+        dx = map(dx, 1F, 2F, 0F, 255F)
+        dy = map(dy, 1F, 2F, 0F, 255F)
+        dz = map(dz, 1F, 2F, 0F, 255F)
+        println(dx, ":", dy, ":", dz)
+        val c = color(dx, dy, dz)
+        return c
+
         //print(machin," : ")
         //return lerpColor(color(30, 93, 100),color(35, 10, 50),machin)
         //        return lerpColor("FF8811".toInt(16),"392F5A".toInt(16),machin)
@@ -152,10 +136,8 @@ class MySketch : PApplet() {
 
 
 fun main(args: Array<String>) {
-    //val fileChooser:FilePicker = FilePicker()
-    //file_chooser.showDialog(null,"t")
-    val image = FilePicker.run()
-    MySketch.run(image)
+    //val image = FilePicker.run()
+    MySketch.run(500, 500)
 }
 
 

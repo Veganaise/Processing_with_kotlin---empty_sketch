@@ -11,7 +11,7 @@ class FilePicker() : PApplet() {
     private var file: File? = null
 
     fun pick_image(): String {
-        val chooser = JFileChooser("D:\\Images\\moodboard")
+        val chooser = JFileChooser("D:\\Images\\Luminar\\2022")
         val filter = FileNameExtensionFilter(
             "Images", "jpg", "gif", "png"
         )
